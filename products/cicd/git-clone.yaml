@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-clone
+spec:
+  workspaces:
+  - name: output
+    description: The git repo will be cloned onto the volume backing this workspace
+  params:
+  - name: url
+    description: git url to clone
+    type: string
+  steps:
+  - name: clone
+    image: alpine
+    script:
+      # git clone https://github.com/IBM/cp4i-deployment-samples.git --branch tkn --single-branch
+      echo "Test run of task xxxxxxx"

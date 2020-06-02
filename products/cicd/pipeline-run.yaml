@@ -1,0 +1,8 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: docker-build-and-deploy-pipeline-run
+  generateName: kb-ace-test-pr-
+spec:
+  pipelineRef:
+    name: docker-build-and-deploy

@@ -1,0 +1,30 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: ace-app-bc
+  labels:
+    app: ace-app
+  annotations:
+    description: Defines how to build the integration application
+spec:
+  strategy:
+    type: Docker
+    dockerStrategy: {}
+  source:
+    type: Git
+    dockerfile: |-
+      FROM ibmcom/ace
+      RUN mkdir bars
+      COPY simpleGET.bar /home/aceuser/bars
+      RUN ace_compile_bars.sh
+    git:
+      uri: 'https://github.com/ucubuk4T/4686.git'
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'ace-app:latest'
+  resources: {}
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5
+  postCommit: {}
+  triggers: []

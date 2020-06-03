@@ -35,5 +35,6 @@ spec:
         - --no-push
         - --context=$(params.pathToContext)
         - --build-arg=simpleGET.bar
+        # - --build-arg bar_file_name=simpleGET.bar
       securityContext:
         runAsUser: 0

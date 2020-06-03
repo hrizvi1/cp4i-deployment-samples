@@ -35,12 +35,11 @@ spec:
         - /kaniko/executor
       args:
         - --dockerfile=$(params.pathToDockerFile)
-        - --destination=$(resources.outputs.builtImage.url)
-        # - --no-push
+        - --destination=$(resources.outputs.builtImage.url)/ace/test3:latest
         - --context=$(params.pathToContext)
         - --build-arg=$(params.bar_file_name)
         - --verbosity=debug
-        - --insecure
+        - --log-timestamp
         - --insecure-registry=$(resources.outputs.builtImage.url)
       securityContext:
         runAsUser: 0

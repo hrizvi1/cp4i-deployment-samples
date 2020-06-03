@@ -16,7 +16,7 @@
 
 # export INTERNAL_REGISTRY="image-registry.openshift-image-registry.svc:5000/$NAMESPACE"
 
-# echo $DOCKER_REGISTRY - include this registry in insecure registries in docker preferences
+# echo $DOCKER_REGISTRY  #include this registry in insecure registries in docker preferences
 
 # export username=image-bot
 
@@ -33,7 +33,9 @@ oc apply -f cicd-resources.yaml
 oc apply -f build-push-task.yaml
 oc apply -f cicd-task-run.yaml
 
-# Usage:
+
+
+# EXECCUTOR COMMAND Usage:
 #   executor [flags]
 #   executor [command]
 

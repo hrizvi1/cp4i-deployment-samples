@@ -20,4 +20,4 @@ spec:
   type: image
   params:
     - name: url
-      value: default-route-openshift-image-registry.kbcl2-373409-ec111ed5d7db435e1c5eeeb4400d693f-0000.eu-gb.containers.appdomain.cloud:5000/ace
+      value: default-route-openshift-image-registry.kbcl2-373409-ec111ed5d7db435e1c5eeeb4400d693f-0000.eu-gb.containers.appdomain.cloud #change this to the cluster's icp-console route

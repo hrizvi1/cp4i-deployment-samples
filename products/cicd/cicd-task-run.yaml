@@ -11,12 +11,14 @@ spec:
       value: DOCKERFILE
     - name: pathToContext
       value: $(resources.inputs.docker-source.path)/products/cicd/ #configure: may change according to your source
+    - name: bar_file_name
+      value: bar_file_name=simpleGET.bar #this filename should be in the format "bar_file_name=<actual_bar_file_name_with_extension>"
   resources:
     inputs:
       - name: docker-source
         resourceRef:
           name: git-resource
-    # outputs:
-    #   - name: builtImage
-    #     resourceRef:
-    #       name: image-push-resource
+    outputs:
+      - name: builtImage
+        resourceRef:
+          name: image-push-resource

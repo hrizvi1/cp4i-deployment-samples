@@ -14,13 +14,17 @@ spec:
         The build context used by Kaniko
         (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
       default: $(resources.inputs.docker-source.path)
+    - name: bar_file_name
+      type: string
+      description: Bar file name
+      default: bar_file_name=simpleGET.bar
   resources:
     inputs:
       - name: docker-source
         type: git
-    # outputs:
-    #   - name: builtImage
-    #     type: image
+    outputs:
+      - name: builtImage
+        type: image
   steps:
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:latest
@@ -31,10 +35,12 @@ spec:
         - /kaniko/executor
       args:
         - --dockerfile=$(params.pathToDockerFile)
-        # - --destination=$(resources.outputs.builtImage.url)
+        - --destination=$(resources.outputs.builtImage.url)
         - --no-push
         - --context=$(params.pathToContext)
-        - --build-arg=simpleGET.bar
-        # - --build-arg bar_file_name=simpleGET.bar
+        - --build-arg=$(params.bar_file_name)
+        - --verbosity=debug
+        - --insecure
+        - --insecure-registry=$(resources.outputs.builtImage.url)
       securityContext:
         runAsUser: 0

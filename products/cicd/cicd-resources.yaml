@@ -1,0 +1,23 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: git-resource
+spec:
+  type: git
+  params:
+    - name: revision
+      value: tkn
+    - name: url
+      value: https://github.com/IBM/cp4i-deployment-samples
+
+---
+
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: image-push-resource
+spec:
+  type: image
+  params:
+    - name: url
+      value: default-route-openshift-image-registry.kbcl2-373409-ec111ed5d7db435e1c5eeeb4400d693f-0000.eu-gb.containers.appdomain.cloud:5000/ace

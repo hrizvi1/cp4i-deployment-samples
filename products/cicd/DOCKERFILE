@@ -2,4 +2,7 @@ FROM ibmcom/ace
 ARG bar_file_name
 RUN mkdir bars
 COPY $bar_file_name /home/aceuser/bars
+RUN pwd
+RUN ls /home/aceuser/bars
+RUN pwd
 RUN ace_compile_bars.sh

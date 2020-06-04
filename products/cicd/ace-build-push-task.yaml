@@ -43,13 +43,13 @@ spec:
     - name: pathToDockerFile
       type: string
       description: The path to the dockerfile to build
-      default: $(resources.inputs.docker-source.path)/DOCKERFILE
+      default: $(resources.inputs.docker-source.path)/Dockerfile
     - name: pathToContext
       type: string
       description: |
         The build context used by Kaniko
         (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
-      default: $(resources.inputs.docker-source.path)/products/cicd/
+      default: $(resources.inputs.docker-source.path)/products/cicd
     - name: bar_file_name
       type: string
       description: Bar file name

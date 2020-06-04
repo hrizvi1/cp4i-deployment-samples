@@ -13,10 +13,10 @@ spec:
     - name: ace-run
       taskRef:
         name: build-push-docker-image
-      # resources:
-      #   inputs:
-      #     - name: git-source
-      #       resource: git-source
-      #   outputs:
-      #     - name: builtImage
-      #       resource: docker-image
+      resources:
+        inputs:
+          - name: docker-source
+            resource: git-source
+        outputs:
+          - name: builtImage
+            resource: docker-image

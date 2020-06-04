@@ -1,5 +1,13 @@
 #!/bin/bash -e
 
+#install openshift pipelines
+# oc apply --filename https://storage.googleapis.com/tekton-releases/pipeline/previous/v0.12.1/release.yaml
+# kubectl get pods --namespace tekton-pipelines --watch
+
+#for linux - local install
+# curl -LO https://github.com/tektoncd/cli/releases/download/v0.9.0/tkn_0.9.0_Linux_x86_64.tar.gz
+# sudo tar xvzf tkn_0.9.0_Linux_arm64.tar.gz -C /usr/local/bin/ tkn
+
 # # export ICP_CONSOLE="$(oc get routes --all-namespaces | grep icp-console | awk '{print $3}')"
 
 # # cloudctl login -a $ICP_CONSOLE -u admin -p ibm-cloud-private-admin-password -n ace
@@ -28,10 +36,16 @@
 
 # oc create secret docker-registry cicd-ace --docker-server=$DOCKER_REGISTRY --docker-username=$username --docker-password=$password
 
+
+tkn resource delete --all -f
+tkn t delete --all -f
+tkn tr delete --all -f
+tkn p delete --all -f
+tkn pr delete --all -f
 oc apply -f ace-build-push-task.yaml
 oc apply -f ace-pipeline.yaml
 oc apply -f ace-pipeline-run.yaml
-
+tkn pr logs ace-pipeline-run -f
 
 # EXECCUTOR COMMAND Usage:
 #   executor [flags]

@@ -26,13 +26,11 @@
 
 # oc adm policy add-scc-to-group privileged system:serviceaccounts:$NAMESPACE
 
-# oc create secret docker-registry regcred --docker-server=$DOCKER_REGISTRY --docker-username=$username --docker-password=$password
+# oc create secret docker-registry cicd-ace --docker-server=$DOCKER_REGISTRY --docker-username=$username --docker-password=$password
 
-# oc apply -f cicd-sa.yaml
-oc apply -f cicd-resources.yaml
-oc apply -f build-push-task.yaml
-oc apply -f cicd-task-run.yaml
-
+oc apply -f ace-build-push-task.yaml
+oc apply -f ace-pipeline.yaml
+oc apply -f ace-pipeline-run.yaml
 
 
 # EXECCUTOR COMMAND Usage:

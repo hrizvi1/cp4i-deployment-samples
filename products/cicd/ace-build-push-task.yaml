@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cicd-ace-sa
+secrets:
+  - name: cicd-ace
+
+---
+
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: git-source
+spec:
+  type: git
+  params:
+    - name: revision
+      value: tkn
+    - name: url
+      value: https://github.com/IBM/cp4i-deployment-samples
+
+---
+
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: docker-image
+spec:
+  type: image
+  params:
+    - name: url
+      #change this to the cluster's icp-console route
+      value: default-route-openshift-image-registry.kbcl2-373409-ec111ed5d7db435e1c5eeeb4400d693f-0000.eu-gb.containers.appdomain.cloud
+
+---
+
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-push-docker-image
+spec:
+  params:
+    - name: pathToDockerFile
+      type: string
+      description: The path to the dockerfile to build
+      default: $(resources.inputs.docker-source.path)/DOCKERFILE
+    - name: pathToContext
+      type: string
+      description: |
+        The build context used by Kaniko
+        (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
+      default: $(resources.inputs.docker-source.path)/products/cicd/
+    - name: bar_file_name
+      type: string
+      description: Bar file name
+      default: bar_file_name=simpleGET.bar
+  resources:
+    inputs:
+      - name: docker-source
+        type: git
+    outputs:
+      - name: builtImage
+        type: image
+  steps:
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:latest
+      env:
+        - name: "DOCKER_CONFIG"
+          value: "/tekton/home/.docker/"
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=$(params.pathToDockerFile)
+        - --destination=$(resources.outputs.builtImage.url)/ace/test3:latest
+        - --context=$(params.pathToContext)
+        - --build-arg=$(params.bar_file_name)
+        - --verbosity=debug
+        - --log-timestamp
+        - --insecure-registry=$(resources.outputs.builtImage.url)
+      securityContext:
+        runAsUser: 0

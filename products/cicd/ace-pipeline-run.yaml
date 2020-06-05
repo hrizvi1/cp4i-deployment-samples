@@ -8,7 +8,7 @@ spec:
     name: ace-pipeline
   params:
     - name: pathToDockerFile
-      value: DOCKERFILE
+      value: $(resources.inputs.git-source.path)/products/cicd/DOCKERFILE
     - name: pathToContext
       value: $(resources.inputs.git-source.path)/products/cicd #configure: may change according to your source
     - name: bar_file_name

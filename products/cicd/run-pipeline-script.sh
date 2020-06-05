@@ -42,10 +42,13 @@ tkn t delete --all -f
 tkn tr delete --all -f
 tkn p delete --all -f
 tkn pr delete --all -f
+
 # oc apply -f example.yaml
 # tkn pr logs demo-pipeline-run-1 -f
 
-
+oc apply -f ace-sa.yaml
+oc apply -f ace-git-resource.yaml
+oc apply -f ace-image-registry-resource.yaml
 oc apply -f ace-build-push-task.yaml
 oc apply -f ace-pipeline.yaml
 oc apply -f ace-pipeline-run.yaml

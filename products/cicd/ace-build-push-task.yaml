@@ -35,7 +35,7 @@ spec:
         - /kaniko/executor
       args:
         - --dockerfile=$(params.pathToDockerFile)
-        - --destination=$(resources.outputs.docker-image.url)/ace/test1:latest
+        - --destination=$(resources.outputs.docker-image.url)
         - --context=$(params.pathToContext)
         - --build-arg=$(params.bar_file_name)
         - --verbosity=debug

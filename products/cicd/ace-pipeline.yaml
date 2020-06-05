@@ -4,6 +4,21 @@ metadata:
   name: ace-pipeline
   namespace: ace
 spec:
+  params:
+    - name: pathToDockerFile
+      type: string
+      description: The path to the dockerfile to build
+      default: $(resources.git-source.path)/products/cicd/DOCKERFILE
+    - name: pathToContext
+      type: string
+      description: |
+        The build context used by Kaniko
+        (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
+      default: $(resources.git-source.path)/products/cicd
+    - name: bar_file_name
+      type: string
+      description: Bar file name
+      default: bar_file_name=simpleGET.bar
   resources:
     - name: git-source
       type: git
@@ -13,6 +28,13 @@ spec:
     - name: ace-run
       taskRef:
         name: build-push-docker-image
+      params:
+        - name: pathToDockerFile
+          value: "$(params.pathToDockerFile)"
+        - name: pathToContext
+          value: "$(params.pathToContext)"
+        - name: bar_file_name
+          value: "$(params.bar_file_name)"
       resources:
         inputs:
           - name: git-source

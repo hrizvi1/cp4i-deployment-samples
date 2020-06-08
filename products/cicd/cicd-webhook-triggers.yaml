@@ -159,14 +159,3 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: tekton-triggers-role
-
----
-
-apiVersion: v1
-kind: Secret
-metadata:
-  name: webhook-secret
-stringData:
-  #https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line#creating-a-token
-  token: #token here
-  secret: cicd-secret-webhook

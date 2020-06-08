@@ -39,7 +39,6 @@ spec:
       type: image
       params:
       - name: url
-        # value: image-registry.openshift-image-registry.svc:5000/ace/$(params.git-repo-name):latest
         value: default-route-openshift-image-registry.kbcl2-450523-ec111ed5d7db435e1c5eeeb4400d693f-0000.eu-gb.containers.appdomain.cloud/ace/test5:latest
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineRun
@@ -169,5 +168,5 @@ metadata:
   name: webhook-secret
 stringData:
   #https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line#creating-a-token
-  token: c1b1bb81e354047048c8b1da71e9c9fd6229972d
+  token: #token here
   secret: cicd-secret-webhook

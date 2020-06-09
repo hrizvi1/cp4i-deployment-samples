@@ -104,17 +104,17 @@ spec:
               - name: git-source-$(uid)
                 resource: git-source-$(uid)
         # call the tekton cli task
-        - name: run-build-pipeline-$(uid)
-          taskRef:
-            name: tekton-cli-$(uid)
-          runAfter: cicd-openshift-client-apply-$(uid)
-          params:
-            - name: ARGS
-              value: 
-          resources:
-            inputs:
-              - name: git-source-$(uid)
-                resource: git-source-$(uid)
+        # - name: run-build-pipeline-$(uid)
+        #   taskRef:
+        #     name: tekton-cli-$(uid)
+        #   runAfter: cicd-openshift-client-apply-$(uid)
+        #   params:
+        #     - name: ARGS
+        #       value: 
+        #   resources:
+        #     inputs:
+        #       - name: git-source-$(uid)
+        #         resource: git-source-$(uid)
 
   # pipelinerun
   - apiVersion: tekton.dev/v1alpha1

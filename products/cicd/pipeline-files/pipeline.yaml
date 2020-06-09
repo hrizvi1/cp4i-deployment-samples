@@ -1,0 +1,144 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: git-source-$(uid)
+spec:
+  type: git
+  params:
+    - name: revision
+      value: tkn
+    - name: url
+      value: https://github.com/IBM/cp4i-deployment-samples
+
+---
+
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: docker-image-$(uid)
+spec:
+  type: image
+  params:
+    - name: url
+      #change this to the cluster's icp-console route
+      value: default-route-openshift-image-registry.kbcl2-450523-ec111ed5d7db435e1c5eeeb4400d693f-0000.eu-gb.containers.appdomain.cloud/ace/test4:latest
+
+---
+
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-push-docker-image-$(uid)
+spec:
+  params:
+    - name: pathToDockerFile
+      type: string
+      description: The path to the dockerfile to build
+      default: $(resources.inputs.git-source-$(uid).path)/products/cicd/DOCKERFILE
+    - name: pathToContext
+      type: string
+      description: |
+        The build context used by Kaniko
+        (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
+      default: $(resources.inputs.git-source-$(uid).path)/products/cicd
+    - name: bar_file_name
+      type: string
+      description: Bar file name
+      default: bar_file_name=simpleGET.bar
+  resources:
+    inputs:
+      - name: git-source-$(uid)
+        type: git
+    outputs:
+      - name: docker-image-$(uid)
+        type: image
+  steps:
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:latest
+      env:
+        - name: "DOCKER_CONFIG"
+          value: "/tekton/home/.docker/"
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=$(params.pathToDockerFile)
+        - --destination=$(resources.outputs.docker-image-$(uid).url)
+        - --context=$(params.pathToContext)
+        - --build-arg=$(params.bar_file_name)
+        - --verbosity=debug
+        - --log-timestamp
+        - --insecure-registry=$(resources.outputs.docker-image-$(uid).url)
+      securityContext:
+        runAsUser: 0
+
+---
+
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: ace-pipeline
+  namespace: ace
+spec:
+  params:
+    - name: pathToDockerFile
+      type: string
+      description: The path to the dockerfile to build
+      default: $(resources.git-source-$(uid).path)/products/cicd/DOCKERFILE
+    - name: pathToContext
+      type: string
+      description: |
+        The build context used by Kaniko
+        (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
+      default: $(resources.git-source-$(uid).path)/products/cicd
+    - name: bar_file_name
+      type: string
+      description: Bar file name
+      default: bar_file_name=simpleGET.bar
+  resources:
+    - name: git-source-$(uid)
+      type: git
+    - name: docker-image-$(uid)
+      type: image
+  tasks:
+    - name: ace-run
+      taskRef:
+        name: build-push-docker-image-$(uid)
+      params:
+        - name: pathToDockerFile
+          value: "$(params.pathToDockerFile)"
+        - name: pathToContext
+          value: "$(params.pathToContext)"
+        - name: bar_file_name
+          value: "$(params.bar_file_name)"
+      resources:
+        inputs:
+          - name: git-source-$(uid)
+            resource: git-source-$(uid)
+        outputs:
+          - name: docker-image-$(uid)
+            resource: docker-image-$(uid)
+
+---
+
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: ace-pipeline-run
+spec:
+  serviceAccountName: cicd-ace-sa
+  pipelineRef:
+    name: ace-pipeline
+  params:
+    - name: pathToDockerFile
+      value: $(resources.inputs.git-source-$(uid).path)/products/cicd/DOCKERFILE
+    - name: pathToContext
+      value: $(resources.inputs.git-source-$(uid).path)/products/cicd #configure: may change according to your source
+    - name: bar_file_name
+      value: bar_file_name=simpleGET.bar #this filename should be in the format "bar_file_name=<actual_bar_file_name_with_extension>"
+  resources:
+    - name: git-source-$(uid)
+      resourceRef:
+        name: git-source-$(uid)
+    - name: docker-image-$(uid)
+      resourceRef:
+        name: docker-image-$(uid)

@@ -11,136 +11,47 @@ spec:
     default: master
   - name: git-repo-name
     description: The name of the deployment to be created / patched
-  - name: pathToDockerFile
-    description: Path to the docker file
-  - name: pathToContext
-    description: Context path
-  - name: bar_file_name
-    description: default bar file name
+  - name: SCRIPT
+    description: oc script to run
   resourcetemplates:
-  # - apiVersion: tekton.dev/v1alpha1
-  #   kind: PipelineResource
-  #   metadata:
-  #     name: cicd-$(params.git-repo-name)-git-repo-$(uid)
-  #     namespace: ace
-  #   spec:
-  #     type: git
-  #     params:
-  #     - name: revision
-  #       value: $(params.git-revision)
-  #     - name: url
-  #       value: $(params.git-repo-url)
-  # - apiVersion: tekton.dev/v1alpha1
-  #   kind: PipelineResource
-  #   metadata:
-  #     name: cicd-$(params.git-repo-name)-image-$(uid)
-  #     namespace: ace
-  #   spec:
-  #     type: image
-  #     params:
-  #     - name: url
-  #       value: default-route-openshift-image-registry.kbcl5-230239-ec111ed5d7db435e1c5eeeb4400d693f-0000.eu-gb.containers.appdomain.cloud/ace/test1:latest
-  # - apiVersion: tekton.dev/v1beta1
-  #   kind: Task
-  #   metadata:
-  #     name: cicd-$(params.git-repo-name)-build-push-task-$(uid)
-  #   spec:
-  #     params:
-  #       - name: pathToDockerFile
-  #         type: string
-  #         description: The path to the dockerfile to build
-  #         default: $(resources.inputs.git-source.path)/products/cicd/DOCKERFILE
-  #       - name: pathToContext
-  #         type: string
-  #         description: |
-  #           The build context used by Kaniko
-  #           (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
-  #         default: $(resources.inputs.git-source.path)/products/cicd
-  #       - name: bar_file_name
-  #         type: string
-  #         description: Bar file name
-  #         default: bar_file_name=simpleGET.bar
-  #     resources:
-  #       inputs:
-  #         - name: git-source
-  #           type: git
-  #       outputs:
-  #         - name: docker-image
-  #           type: image
-  #     steps:
-  #       - name: build-and-push
-  #         image: gcr.io/kaniko-project/executor:latest
-  #         env:
-  #           - name: "DOCKER_CONFIG"
-  #             value: "/tekton/home/.docker/"
-  #         command:
-  #           - /kaniko/executor
-  #         args:
-  #           - --dockerfile=$(params.pathToDockerFile)
-  #           - --destination=$(resources.outputs.docker-image.url)
-  #           - --context=$(params.pathToContext)
-  #           - --build-arg=$(params.bar_file_name)
-  #           - --verbosity=debug
-  #           - --log-timestamp
-  #           - --insecure-registry=$(resources.outputs.docker-image.url)
-  #         securityContext:
-  #           runAsUser: 0
-  # - apiVersion: tekton.dev/v1alpha1
-  #   kind: Pipeline
-  #   metadata:
-  #     name: cicd-$(params.git-repo-name)-pipeline-$(uid)
-  #     namespace: ace
-  #   spec:
-  #     params:
-  #       - name: pathToDockerFile
-  #         type: string
-  #         description: The path to the dockerfile to build
-  #         default: $(resources.git-source.path)/products/cicd/DOCKERFILE
-  #       - name: pathToContext
-  #         type: string
-  #         description: |
-  #           The build context used by Kaniko
-  #           (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
-  #         default: $(resources.git-source.path)/products/cicd
-  #       - name: bar_file_name
-  #         type: string
-  #         description: Bar file name
-  #         default: bar_file_name=simpleGET.bar
-  #     resources:
-  #       - name: git-source
-  #         type: git
-  #       - name: docker-image
-  #         type: image
-  #     tasks:
-  #       - name: ace-run
-  #         taskRef:
-  #           name: cicd-$(params.git-repo-name)-build-push-task-$(uid)
-  #         params:
-  #           - name: pathToDockerFile
-  #             value: "$(params.pathToDockerFile)"
-  #           - name: pathToContext
-  #             value: "$(params.pathToContext)"
-  #           - name: bar_file_name
-  #             value: "$(params.bar_file_name)"
-  #         resources:
-  #           inputs:
-  #             - name: git-source
-  #               resource: git-source
-  #           outputs:
-  #             - name: docker-image
-  #               resource: docker-image
+
+  # this resource is created to do a git clone to get files to apply using build pipelinerun
   - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineResource
+    metadata:
+      name: git-source
+      namespace: ace
+    spec:
+      type: git
+      params:
+      - name: revision
+        value: $(params.git-revision)
+      - name: url
+        value: $(params.git-repo-url)
+
+  # runs commands against the cluster where the task run is being executed
+  # https://github.com/tektoncd/catalog/tree/v1beta1/openshift-client
+  - apiVersion: tekton.dev/v1beta1
     kind: Task
     metadata:
-      name: cicd-$(params.git-repo-name)-task-to-apply-yamls-$(uid)
+      name: openshift-client
     spec:
+      params:
+      - name: SCRIPT
+        description: The OpenShift CLI arguments to run
+        type: string
+        default: "oc $@"
+      resources:
+        inputs:
+          - name: git-source
+            type: git
+            optional: true
       steps:
-        - name: oc-apply
-          image: ubuntu
-          command:
-            - oc apply -f
-          args:
-            - /workspace/git-source/products/cicd/pipeline-files/*.yaml
+        - name: oc
+          image: quay.io/openshift/origin-cli:latest
+          script: "$(params.SCRIPT)"
+
+  # pipeline to call task
   - apiVersion: tekton.dev/v1alpha1
     kind: Pipeline
     metadata:
@@ -148,43 +59,26 @@ spec:
       namespace: ace
     spec:
       params:
-        - name: pathToDockerFile
+        - name: SCRIPT
+          description: The OpenShift CLI arguments to run
           type: string
-          description: The path to the dockerfile to build
-          default: $(resources.git-source.path)/products/cicd/DOCKERFILE
-        - name: pathToContext
-          type: string
-          description: |
-            The build context used by Kaniko
-            (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
-          default: $(resources.git-source.path)/products/cicd
-        - name: bar_file_name
-          type: string
-          description: Bar file name
-          default: bar_file_name=simpleGET.bar
+          default: "oc $@"
       resources:
         - name: git-source
           type: git
-        - name: docker-image
-          type: image
       tasks:
-        - name: ace-run
+        - name: cicd-openshift-client-$(uid)
           taskRef:
-            name: cicd-$(params.git-repo-name)-build-push-task-$(uid)
+            name: openshift-client
           params:
-            - name: pathToDockerFile
-              value: "$(params.pathToDockerFile)"
-            - name: pathToContext
-              value: "$(params.pathToContext)"
-            - name: bar_file_name
-              value: "$(params.bar_file_name)"
+            - name: SCRIPT
+              value: "oc apply -f /workspace/git-source/products/cicd/pipeline-files/pipeline.yaml"
           resources:
             inputs:
               - name: git-source
                 resource: git-source
-            outputs:
-              - name: docker-image
-                resource: docker-image
+
+  # pipelinerun
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineRun
     metadata:
@@ -197,40 +91,7 @@ spec:
       resources:
       - name: git-source
         resourceRef:
-          name: cicd-$(params.git-repo-name)-git-repo-$(uid)
-      - name: docker-image
-        resourceRef:
-          name: cicd-$(params.git-repo-name)-image-$(uid)
-      params:
-      - name: pathToDockerFile
-        value: /workspace/git-source/products/cicd/DOCKERFILE
-      - name: pathToContext
-        value: /workspace/git-source/products/cicd #configure: may change according to your source
-      - name: bar_file_name
-        value: bar_file_name=simpleGET.bar #this filename should be in the format "bar_file_name=<actual_bar_file_name_with_extension>"
-  # - apiVersion: tekton.dev/v1alpha1
-  #   kind: PipelineRun
-  #   metadata:
-  #     name: cicd-$(params.git-repo-name)-pipelinerun2-$(uid)
-  #     namespace: ace
-  #   spec:
-  #     pipelineRef:
-  #       name: cicd-$(params.git-repo-name)-pipeline-$(uid)
-  #     serviceAccountName: cicd-ace-sa
-  #     resources:
-  #     - name: git-source
-  #       resourceRef:
-  #         name: cicd-$(params.git-repo-name)-git-repo-$(uid)
-  #     - name: docker-image
-  #       resourceRef:
-  #         name: cicd-$(params.git-repo-name)-image-$(uid)
-  #     params:
-  #     - name: pathToDockerFile
-  #       value: /workspace/git-source/products/cicd/DOCKERFILE
-  #     - name: pathToContext
-  #       value: /workspace/git-source/products/cicd #configure: may change according to your source
-  #     - name: bar_file_name
-  #       value: bar_file_name=simpleGET.bar #this filename should be in the format "bar_file_name=<actual_bar_file_name_with_extension>"
+          name: git-source
 
 ---
 
@@ -247,12 +108,6 @@ spec:
     value: cp4i-deployment-samples
   - name: git-revision
     value: tkn
-  - name: pathToDockerFile
-    value: /workspace/git-source/products/cicd/DOCKERFILE
-  - name: pathToContext
-    value: /workspace/git-source/products/cicd
-  - name: bar_file_name
-    value: bar_file_name=simpleGET.bar
 
 ---
 

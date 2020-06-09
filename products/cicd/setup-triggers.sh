@@ -11,4 +11,6 @@ tkn triggertemplate delete --all -f
 oc delete rolebinding tekton-triggers-rolebinding
 oc delete role tekton-triggers-role
 
-oc apply -f cicd-webhook-triggers.yaml
+# oc apply -f cicd-webhook-triggers.yaml
+
+oc apply -f trigger-test.yaml

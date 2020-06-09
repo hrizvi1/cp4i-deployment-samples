@@ -45,6 +45,12 @@ spec:
       type: string
       description: Bar file name
       default: bar_file_name=simpleGET.bar
+    - name: imageNameTag
+      type: string
+      description: The name and the tag of the image to build
+    - name: imageNamespace
+      type: string
+      description: Namespace to push built image to
   resources:
     inputs:
       - name: git-source
@@ -62,7 +68,7 @@ spec:
         - /kaniko/executor
       args:
         - --dockerfile=$(params.pathToDockerFile)
-        - --destination=$(resources.outputs.docker-image.url)/ace/test-1:latest
+        - --destination=$(resources.outputs.docker-image.url)/$(params.imageNamespace)/$(params.imageNameTag)
         - --context=$(params.pathToContext)
         - --build-arg=$(params.bar_file_name)
         - --verbosity=debug
@@ -94,6 +100,12 @@ spec:
       type: string
       description: Bar file name
       default: bar_file_name=simpleGET.bar
+    - name: imageNameTag
+      type: string
+      description: The name and the tag of the image to build
+    - name: imageNamespace
+      type: string
+      description: Namespace to push built image to
   resources:
     - name: git-source
       type: git
@@ -110,6 +122,10 @@ spec:
           value: "$(params.pathToContext)"
         - name: bar_file_name
           value: "$(params.bar_file_name)"
+        - name: imageNameTag
+          value: "$(params.imageNameTag)"
+        - name: imageNamespace
+          value: "$(params.imageNamespace)"
       resources:
         inputs:
           - name: git-source
@@ -134,7 +150,11 @@ spec:
     - name: pathToContext
       value: $(resources.inputs.git-source.path)/products/cicd #configure: may change according to your source
     - name: bar_file_name
-      value: bar_file_name=simpleGET.bar #this filename should be in the format "bar_file_name=<actual_bar_file_name_with_extension>"
+      value: bar_file_name=test.bar #this filename should be in the format "bar_file_name=<actual_bar_file_name_with_extension>"
+    - name: imageNameTag
+      value: test-2:latest
+    - name: imageNamespace
+      value: ace
   resources:
     - name: git-source
       resourceRef:

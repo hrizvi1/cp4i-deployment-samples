@@ -19,7 +19,7 @@ spec:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineResource
     metadata:
-      name: git-source
+      name: git-source-$(uid)
       namespace: ace
     spec:
       type: git
@@ -43,7 +43,7 @@ spec:
         default: "oc $@"
       resources:
         inputs:
-          - name: git-source
+          - name: git-source-$(uid)
             type: git
             optional: true
       steps:
@@ -64,7 +64,7 @@ spec:
           type: string
           default: "oc $@"
       resources:
-        - name: git-source
+        - name: git-source-$(uid)
           type: git
       tasks:
         - name: cicd-openshift-client-$(uid)
@@ -72,11 +72,11 @@ spec:
             name: openshift-client
           params:
             - name: SCRIPT
-              value: "oc apply -f /workspace/git-source/products/cicd/pipeline-objects/pipeline.yaml"
+              value: "oc apply -f /workspace/git-source-$(uid)/products/cicd/pipeline-objects/pipeline.yaml"
           resources:
             inputs:
-              - name: git-source
-                resource: git-source
+              - name: git-source-$(uid)
+                resource: git-source-$(uid)
 
   # pipelinerun
   - apiVersion: tekton.dev/v1alpha1
@@ -89,9 +89,9 @@ spec:
         name: cicd-$(params.git-repo-name)-pipeline1-$(uid)
       serviceAccountName: cicd-ace-sa
       resources:
-      - name: git-source
+      - name: git-source-$(uid)
         resourceRef:
-          name: git-source
+          name: git-source-$(uid)
 
 ---
 

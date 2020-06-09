@@ -140,7 +140,7 @@ spec:
           command:
             - oc apply -f
           args:
-            - /workspace/git-source/products/cicd/pipeline-resources/*.yaml
+            - /workspace/git-source/products/cicd/pipeline-files/*.yaml
   - apiVersion: tekton.dev/v1alpha1
     kind: Pipeline
     metadata:

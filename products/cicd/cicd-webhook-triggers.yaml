@@ -43,7 +43,7 @@ spec:
   - apiVersion: tekton.dev/v1beta1
     kind: Task
     metadata:
-      name: build-push-docker-image
+      name: cicd-$(params.git-repo-name)-build-push-task-$(uid)
     spec:
       params:
         - name: pathToDockerFile
@@ -88,7 +88,7 @@ spec:
   - apiVersion: tekton.dev/v1alpha1
     kind: Pipeline
     metadata:
-      name: ace-pipeline
+      name: cicd-$(params.git-repo-name)-pipeline-$(uid)
       namespace: ace
     spec:
       params:
@@ -114,7 +114,7 @@ spec:
       tasks:
         - name: ace-run
           taskRef:
-            name: build-push-docker-image
+            name: cicd-$(params.git-repo-name)-build-push-task-$(uid)
           params:
             - name: pathToDockerFile
               value: "$(params.pathToDockerFile)"
@@ -136,7 +136,7 @@ spec:
       namespace: ace
     spec:
       pipelineRef:
-        name: ace-pipeline
+        name: cicd-$(params.git-repo-name)-pipeline-$(uid)
       serviceAccountName: cicd-ace-sa
       resources:
       - name: git-source
@@ -235,7 +235,6 @@ metadata:
   name: cicd-ace-sa
 secrets:
   - name: cicd-ace
-
 
 ---
 

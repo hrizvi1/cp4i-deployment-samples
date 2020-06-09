@@ -13,4 +13,4 @@ oc delete role tekton-triggers-role
 
 # oc apply -f cicd-webhook-triggers.yaml
 
-oc apply -f trigger-test.yaml
+oc apply -f trigger-build.pipeline.yaml

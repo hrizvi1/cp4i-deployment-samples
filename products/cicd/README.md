@@ -1,8 +1,6 @@
 # Pipeline Run Steps
 
-Samples for deploying Cloud Pak for Integration capabilities in a pipeline.
-
-These samples are aimed at providing a way to quickly configure CP4I for running demos and exploring functionality. They are not designed for production use.
+Steps to setup triggers and run pipeline runs to create image with bar filss baked in it:
 
 - oc apply --filename https://storage.googleapis.com/tekton-releases/pipeline/previous/v0.12.1/release.yaml
 - oc apply -f https://storage.googleapis.com/tekton-releases/triggers/previous/v0.5.0/release.yaml

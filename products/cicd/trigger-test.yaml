@@ -208,29 +208,29 @@ spec:
         value: /workspace/git-source/products/cicd #configure: may change according to your source
       - name: bar_file_name
         value: bar_file_name=simpleGET.bar #this filename should be in the format "bar_file_name=<actual_bar_file_name_with_extension>"
-  - apiVersion: tekton.dev/v1alpha1
-    kind: PipelineRun
-    metadata:
-      name: cicd-$(params.git-repo-name)-pipelinerun2-$(uid)
-      namespace: ace
-    spec:
-      pipelineRef:
-        name: cicd-$(params.git-repo-name)-pipeline-$(uid)
-      serviceAccountName: cicd-ace-sa
-      resources:
-      - name: git-source
-        resourceRef:
-          name: cicd-$(params.git-repo-name)-git-repo-$(uid)
-      - name: docker-image
-        resourceRef:
-          name: cicd-$(params.git-repo-name)-image-$(uid)
-      params:
-      - name: pathToDockerFile
-        value: /workspace/git-source/products/cicd/DOCKERFILE
-      - name: pathToContext
-        value: /workspace/git-source/products/cicd #configure: may change according to your source
-      - name: bar_file_name
-        value: bar_file_name=simpleGET.bar #this filename should be in the format "bar_file_name=<actual_bar_file_name_with_extension>"
+  # - apiVersion: tekton.dev/v1alpha1
+  #   kind: PipelineRun
+  #   metadata:
+  #     name: cicd-$(params.git-repo-name)-pipelinerun2-$(uid)
+  #     namespace: ace
+  #   spec:
+  #     pipelineRef:
+  #       name: cicd-$(params.git-repo-name)-pipeline-$(uid)
+  #     serviceAccountName: cicd-ace-sa
+  #     resources:
+  #     - name: git-source
+  #       resourceRef:
+  #         name: cicd-$(params.git-repo-name)-git-repo-$(uid)
+  #     - name: docker-image
+  #       resourceRef:
+  #         name: cicd-$(params.git-repo-name)-image-$(uid)
+  #     params:
+  #     - name: pathToDockerFile
+  #       value: /workspace/git-source/products/cicd/DOCKERFILE
+  #     - name: pathToContext
+  #       value: /workspace/git-source/products/cicd #configure: may change according to your source
+  #     - name: bar_file_name
+  #       value: bar_file_name=simpleGET.bar #this filename should be in the format "bar_file_name=<actual_bar_file_name_with_extension>"
 
 ---
 

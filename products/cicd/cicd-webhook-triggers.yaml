@@ -39,7 +39,7 @@ spec:
       type: image
       params:
       - name: url
-        value: default-route-openshift-image-registry.kbcl5-230239-ec111ed5d7db435e1c5eeeb4400d693f-0000.eu-gb.containers.appdomain.cloud/ace/test1:latest
+        value: default-route-openshift-image-registry.kbcl5-230239-ec111ed5d7db435e1c5eeeb4400d693f-0000.eu-gb.containers.appdomain.cloud/ace/test2:latest
   - apiVersion: tekton.dev/v1beta1
     kind: Task
     metadata:

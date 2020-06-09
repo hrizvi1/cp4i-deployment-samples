@@ -1,0 +1,45 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-push-docker-image
+spec:
+  params:
+    - name: pathToDockerFile
+      type: string
+      description: The path to the dockerfile to build
+      default: $(resources.inputs.git-source.path)/products/cicd/DOCKERFILE
+    - name: pathToContext
+      type: string
+      description: |
+        The build context used by Kaniko
+        (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
+      default: $(resources.inputs.git-source.path)/products/cicd
+    - name: bar_file_name
+      type: string
+      description: Bar file name
+      default: bar_file_name=simpleGET.bar
+  resources:
+    inputs:
+      - name: git-source
+        type: git
+    outputs:
+      - name: docker-image
+        type: image
+  steps:
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:latest
+      env:
+        - name: "DOCKER_CONFIG"
+          value: "/tekton/home/.docker/"
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=$(params.pathToDockerFile)
+        - --destination=$(resources.outputs.docker-image.url)
+        - --context=$(params.pathToContext)
+        - --build-arg=$(params.bar_file_name)
+        - --verbosity=debug
+        - --log-timestamp
+        - --insecure-registry=$(resources.outputs.docker-image.url)
+      securityContext:
+        runAsUser: 0

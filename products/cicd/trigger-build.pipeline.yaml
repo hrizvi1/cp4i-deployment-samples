@@ -13,6 +13,13 @@ spec:
     description: The name of the deployment to be created / patched
   - name: SCRIPT
     description: oc script to run
+  # - name: tkn-image
+  #   description: tkn CLI container image to run this task
+  #   default: gcr.io/tekton-releases/dogfooding/tkn
+  # - name: ARGS
+  #   type: array
+  #   description: tkn CLI arguments to run
+
   resourcetemplates:
 
   # this resource is created to do a git clone to get files to apply using build pipelinerun
@@ -28,6 +35,25 @@ spec:
         value: $(params.git-revision)
       - name: url
         value: $(params.git-repo-url)
+
+  # tekton cli task
+  # - apiVersion: tekton.dev/v1beta1
+  #   kind: Task
+  #   metadata:
+  #     name: tekton-cli-$(uid)
+  #   spec:
+  #     params:
+  #     - name: tkn-image
+  #       description: tkn CLI container image to run this task
+  #       default: gcr.io/tekton-releases/dogfooding/tkn
+  #     - name: ARGS
+  #       type: array
+  #       description: tkn CLI arguments to run
+  #     steps:
+  #       - name: tkn
+  #         image: "$(params.tkn-image)"
+  #         command: ["/usr/local/bin/tkn"]
+  #         args: ["$(params.ARGS)"]
 
   # runs commands against the cluster where the task run is being executed
   # https://github.com/tektoncd/catalog/tree/v1beta1/openshift-client
@@ -67,12 +93,24 @@ spec:
         - name: git-source-$(uid)
           type: git
       tasks:
-        - name: cicd-openshift-client-$(uid)
+        - name: cicd-openshift-client-apply-$(uid)
           taskRef:
             name: openshift-client-$(uid)
           params:
             - name: SCRIPT
               value: "oc apply -f /workspace/git-source-$(uid)/products/cicd/pipeline-objects/"
+          resources:
+            inputs:
+              - name: git-source-$(uid)
+                resource: git-source-$(uid)
+        # call the tekton cli task
+        - name: run-build-pipeline-$(uid)
+          taskRef:
+            name: tekton-cli-$(uid)
+          runAfter: cicd-openshift-client-apply-$(uid)
+          params:
+            - name: ARGS
+              value: 
           resources:
             inputs:
               - name: git-source-$(uid)
@@ -130,7 +168,7 @@ metadata:
   name: tekton-triggers-role
 rules:
 - apiGroups: [""]
-  resources: ["pods", "configmaps"]
+  resources: ["pods", "configmaps", "secrets"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - apiGroups:
   - triggers.tekton.dev

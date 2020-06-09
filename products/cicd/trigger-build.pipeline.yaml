@@ -34,7 +34,7 @@ spec:
   - apiVersion: tekton.dev/v1beta1
     kind: Task
     metadata:
-      name: openshift-client
+      name: openshift-client-$(uid)
     spec:
       params:
       - name: SCRIPT
@@ -69,10 +69,10 @@ spec:
       tasks:
         - name: cicd-openshift-client-$(uid)
           taskRef:
-            name: openshift-client
+            name: openshift-client-$(uid)
           params:
             - name: SCRIPT
-              value: "oc apply -f /workspace/git-source-$(uid)/products/cicd/pipeline-objects/pipeline.yaml"
+              value: "oc apply -f /workspace/git-source-$(uid)/products/cicd/pipeline-objects/*.yaml"
           resources:
             inputs:
               - name: git-source-$(uid)

@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
 metadata:
-  name: git-source
+  generateName: git-source-
 spec:
   type: git
   params:
@@ -15,7 +15,7 @@ spec:
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
 metadata:
-  name: docker-image
+  generateName: docker-image-
 spec:
   type: image
   params:
@@ -28,7 +28,7 @@ spec:
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: build-push-docker-image
+  generateName: build-push-docker-image-
 spec:
   params:
     - name: pathToDockerFile
@@ -81,7 +81,7 @@ spec:
 apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
 metadata:
-  name: ace-pipeline
+  generateName: ace-pipeline-
   namespace: ace
 spec:
   params:
@@ -137,7 +137,7 @@ spec:
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: ace-pipeline-run
+  generateName: ace-pipeline-run-
 spec:
   serviceAccountName: cicd-ace-sa
   pipelineRef:

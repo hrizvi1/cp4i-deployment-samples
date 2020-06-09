@@ -98,7 +98,7 @@ spec:
             name: openshift-client-$(uid)
           params:
             - name: SCRIPT
-              value: "oc apply -f /workspace/git-source-$(uid)/products/cicd/pipeline-objects/"
+              value: "oc create -f /workspace/git-source-$(uid)/products/cicd/pipeline-objects/"
           resources:
             inputs:
               - name: git-source-$(uid)

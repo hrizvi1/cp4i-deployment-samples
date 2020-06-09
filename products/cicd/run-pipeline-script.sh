@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-#install openshift pipelines
+#install tekton
 # oc apply --filename https://storage.googleapis.com/tekton-releases/pipeline/previous/v0.12.1/release.yaml
 # kubectl get pods --namespace tekton-pipelines --watch
 

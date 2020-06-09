@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: ace-pipeline-run
+spec:
+  serviceAccountName: cicd-ace-sa
+  pipelineRef:
+    name: ace-pipeline
+  params:
+    - name: pathToDockerFile
+      value: $(resources.inputs.git-source.path)/products/cicd/DOCKERFILE
+    - name: pathToContext
+      value: $(resources.inputs.git-source.path)/products/cicd #configure: may change according to your source
+    - name: bar_file_name
+      value: bar_file_name=simpleGET.bar #this filename should be in the format "bar_file_name=<actual_bar_file_name_with_extension>"
+  resources:
+    - name: git-source
+      resourceRef:
+        name: git-source
+    - name: docker-image
+      resourceRef:
+        name: docker-image

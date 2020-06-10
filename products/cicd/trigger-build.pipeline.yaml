@@ -93,7 +93,7 @@ spec:
         - name: git-source-$(uid)
           type: git
       tasks:
-        - name: cicd-openshift-client-create-$(uid)
+        - name: cicd-openshift-client-apply-$(uid)
           taskRef:
             name: openshift-client-$(uid)
           params:
@@ -106,7 +106,7 @@ spec:
         - name: cicd-openshift-client-create-pipelinerun-$(uid)
           taskRef:
             name: openshift-client-$(uid)
-          runAfter: cicd-openshift-client-create-$(uid)
+          # runAfter: cicd-openshift-client-create-$(uid)
           params:
             - name: SCRIPT
               value: "oc create -f /workspace/git-source-$(uid)/products/cicd/pipelinerun.yaml"

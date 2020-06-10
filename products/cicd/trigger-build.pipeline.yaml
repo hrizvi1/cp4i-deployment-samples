@@ -52,27 +52,6 @@ spec:
           image: quay.io/openshift/origin-cli:latest
           script: "$(params.SCRIPT)"
 
-  # # tekton task again for openshift
-  # - apiVersion: tekton.dev/v1beta1
-  #   kind: Task
-  #   metadata:
-  #     name: openshift-client-task-for-pipelinerun-$(uid)
-  #   spec:
-  #     params:
-  #     - name: SCRIPT
-  #       description: The OpenShift CLI arguments to run
-  #       type: string
-  #       default: "oc $@"
-  #     resources:
-  #       inputs:
-  #         - name: git-source-$(uid)
-  #           type: git
-  #           optional: true
-  #     steps:
-  #       - name: oc
-  #         image: quay.io/openshift/origin-cli:latest
-  #         script: "$(params.SCRIPT)"
-
   # pipeline to call task
   - apiVersion: tekton.dev/v1alpha1
     kind: Pipeline
@@ -101,8 +80,9 @@ spec:
               - name: git-source-$(uid)
                 resource: git-source-$(uid)
         - name: cicd-openshift-client-create
+          runAfter:
+            - cicd-openshift-client-apply
           taskRef:
-            # name: openshift-client-task-for-pipelinerun-$(uid)
             name: openshift-client-$(uid)
           params:
             - name: SCRIPT

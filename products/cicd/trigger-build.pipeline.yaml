@@ -56,7 +56,7 @@ spec:
   # - apiVersion: tekton.dev/v1beta1
   #   kind: Task
   #   metadata:
-  #     name: openshift-client-2-$(uid)
+  #     name: openshift-client-task-for-pipelinerun-$(uid)
   #   spec:
   #     params:
   #     - name: SCRIPT
@@ -77,7 +77,7 @@ spec:
   - apiVersion: tekton.dev/v1alpha1
     kind: Pipeline
     metadata:
-      name: cicd-$(params.git-repo-name)-pipeline1-$(uid)
+      name: cicd-$(params.git-repo-name)-pipeline-trigger-$(uid)
       namespace: ace
     spec:
       params:
@@ -94,15 +94,15 @@ spec:
             name: openshift-client-$(uid)
           params:
             - name: SCRIPT
-              value: "oc create -f /workspace/git-source-$(uid)/products/cicd/pipeline-objects/"
+              value: "oc create -f /workspace/git-source-$(uid)/products/cicd/pipeline-objects/ || true"
           resources:
             inputs:
               - name: git-source-$(uid)
                 resource: git-source-$(uid)
         # - name: cicd-openshift-client-create
         #   taskRef:
-        #     name: openshift-client-2-$(uid)
-        #   # runAfter: cicd-openshift-client-apply
+        #     # name: openshift-client-task-for-pipelinerun-$(uid)
+        #     name: openshift-client-$(uid)
         #   params:
         #     - name: SCRIPT
         #       value: "oc create -f /workspace/git-source-$(uid)/products/cicd/pipelinerun.yaml"
@@ -115,7 +115,7 @@ spec:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineRun
     metadata:
-      name: cicd-$(params.git-repo-name)-pipelinerun1-$(uid)
+      name: cicd-$(params.git-repo-name)-pipeline-trigger-$(uid)
       namespace: ace
     spec:
       pipelineRef:

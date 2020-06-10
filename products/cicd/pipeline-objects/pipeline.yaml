@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
 metadata:
-  generateName: git-source-
+  Name: git-source
 spec:
   type: git
   params:
@@ -15,7 +15,7 @@ spec:
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
 metadata:
-  generateName: docker-image-
+  Name: docker-image
 spec:
   type: image
   params:
@@ -28,7 +28,7 @@ spec:
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  generateName: build-push-docker-image-
+  Name: build-push-docker-image
 spec:
   params:
     - name: pathToDockerFile
@@ -81,7 +81,7 @@ spec:
 apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
 metadata:
-  generateName: ace-pipeline-
+  Name: ace-pipeline
   namespace: ace
 spec:
   params:
@@ -150,7 +150,7 @@ spec:
     - name: bar_file_name
       value: bar_file_name=SimpleGET.bar #this filename should be in the format "bar_file_name=<actual_bar_file_name_with_extension>"
     - name: imageNameTag
-      value: test-2:latest
+      value: test-3:latest
     - name: imageNamespace
       value: ace
   resources:

@@ -1,8 +1,5 @@
-FROM ibmcom/mq
-#FROM cp.icr.io/cp/icp4i/mq/ibm-mqadvanced-server-integration:9.1.4.0-r1-amd64
-USER 1000:1000
-RUN whoami
-RUN ls -l /etc/mqm
+#FROM ibmcom/mq
+FROM cp.icr.io/cp/icp4i/mq/ibm-mqadvanced-server-integration:9.1.4.0-r1-amd64
 RUN echo -e "\
 DEFINE QLOCAL('AccidentIn') \n\
 DEFINE QLOCAL('AccidentOut') \n\

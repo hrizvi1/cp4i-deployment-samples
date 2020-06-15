@@ -1,5 +1,7 @@
 FROM ibmcom/mq
 #FROM cp.icr.io/cp/icp4i/mq/ibm-mqadvanced-server-integration:9.1.4.0-r1-amd64
+CMD [ "whoami" ]
+RUN ls -l /etc/mqm
 RUN echo -e "\
 DEFINE QLOCAL('AccidentIn') \n\
 DEFINE QLOCAL('AccidentOut') \n\
